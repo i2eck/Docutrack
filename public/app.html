@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sally Joy Camps - Ticketing</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #667085;
+      --paper: #fffdf8;
+      --cream: #fffaf1;
+      --line: #e6e0d6;
+      --orange: #e85d2a;
+      --orange-deep: #c9471c;
+      --navy: #1e3549;
+      --navy-deep: #14283a;
+      --sage: #dce6db;
+      --sage-ink: #1e5a39;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--cream);
+      overflow-x: hidden;
+      color: var(--ink);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 4% 2%, rgba(245, 201, 127, .28), transparent 22rem),
+        radial-gradient(circle at 97% 8%, rgba(150, 190, 173, .18), transparent 25rem),
+        var(--cream);
+      min-height: 100vh;
+    }
+
+    .serif { font-family: 'Fraunces', serif; }
+
+    .app {
+      display: none;
+    }
+
+    .app.active {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+      color: white;
+      padding: 22px 20px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 0 0 26px 26px;
+    }
+
+    .header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5em;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+
+    .header.header--plain {
+      text-align: center;
+      border-radius: 0;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .header-top .avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-top .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3em;
+      flex-shrink: 0;
+    }
+
+    .header-top .greeting {
+      font-size: 0.82em;
+      opacity: 0.85;
+      margin-bottom: 2px;
+    }
+
+    .header-top .title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.25em;
+      font-weight: 700;
+    }
+
+    .header-top .bell {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1em;
+      flex-shrink: 0;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 24px rgba(63, 50, 36, 0.08);
+    }
+
+    .card h2 {
+      font-family: 'Fraunces', serif;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 0.95em;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      font-size: 16px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--paper);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(232, 93, 42, 0.16);
+    }
+
+    .input-icon-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon-wrap .input-icon {
+      position: absolute;
+      left: 14px;
+      font-size: 1.05em;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .input-icon-wrap input,
+    .input-icon-wrap select {
+      padding-left: 42px;
+      border-radius: 12px;
+      border: 1.5px solid var(--line);
+      background: var(--cream);
+    }
+
+    .input-icon-wrap input:focus,
+    .input-icon-wrap select:focus {
+      background: var(--paper);
+      border-color: var(--orange);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      font-size: 1em;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      margin-top: 10px;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--orange-deep);
+      box-shadow: 0 10px 20px rgba(200, 71, 28, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: var(--sage);
+      color: var(--navy);
+      margin-top: 10px;
+    }
+
+    .btn-success {
+      background: #4b806b;
+      color: white;
+    }
+
+    .btn-danger {
+      background: #c73d36;
+      color: white;
+    }
+
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 0.95em;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .alert-info {
+      background: var(--sage);
+      color: var(--sage-ink);
+      border: 1px solid #c3d6c9;
+    }
+
+    /* SELLER APP */
+    .seller-app .content {
+      padding-bottom: 100px;
+    }
+
+    .seller-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 18px 0 4px;
+    }
+
+    .stat-mini {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: white;
+      padding: 14px 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stat-mini .stat-mini-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95em;
+      flex-shrink: 0;
+    }
+
+    .stat-mini--solid {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%);
+      border: none;
+    }
+
+    .stat-mini--solid .stat-mini-icon {
+      background: rgba(255,255,255,0.22);
+    }
+
+    .stat-mini-value {
+      font-size: 1.3em;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .stat-mini-label {
+      font-size: 0.72em;
+      opacity: 0.85;
+    }
+
+    .ticket-result {
+      margin-top: 20px;
+    }
+
+    .ticket-result h3 {
+      text-align: center;
+    }
+
+    .qr-display {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .qr-display img {
+      max-width: 100%;
+      max-height: 250px;
+      border-radius: 8px;
+    }
+
+    .ticket-info {
+      background: var(--paper);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: 0.95em;
+    }
+
+    .ticket-info p {
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .ticket-info strong {
+      color: var(--orange);
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .action-buttons button {
+      margin-top: 0;
+      font-size: 0.9em;
+      padding: 12px;
+    }
+
+    /* CUSTOMER TICKET PAGE */
+    .ticket-page {
+      text-align: center;
+    }
+
+    .ticket-page .content {
+      padding-top: 0;
+    }
+
+    .ticket-container {
+      padding: 0 20px 20px;
+      margin: 0 auto;
+      max-width: 420px;
+    }
+
+    .ticket-qr {
+      margin: 20px 0;
+    }
+
+    .ticket-qr img {
+      max-width: 200px;
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .ticket-details {
+      background: var(--cream);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+      font-size: 0.95em;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .detail-value {
+      color: #333;
+      font-weight: 600;
+    }
+
+    .event-info {
+      background: var(--sage);
+      border-left: 4px solid var(--orange);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .event-info p {
+      margin: 5px 0;
+      font-size: 0.95em;
+    }
+
+    /* CHECK-IN APP */
+    .video-container {
+      background: black;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 20px 0;
+      aspect-ratio: 1;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    canvas {
+      display: none;
+    }
+
+    /* NAVIGATION */
+    .nav-tabs {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--paper);
+      border-top: 1px solid #eee;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+      z-index: 100;
+      padding: 8px 6px;
+    }
+
+    .nav-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px 4px;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #999;
+      font-size: 0.72em;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .nav-tab .nav-tab-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05em;
+      background: transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      color: var(--orange);
+    }
+
+    .nav-tab.active .nav-tab-icon {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%);
+      color: white;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--orange);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .seller-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .seller-selector input {
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 1.3em;
+      }
+
+      .content {
+        padding: 15px;
+      }
+
+      .card {
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* BOARDING PASS TICKET */
+    .boarding-pass {
+      --bp-brand: var(--orange);
+      --bp-brand-deep: var(--orange-deep);
+      --bp-accent: var(--orange);
+      --bp-tint: #eef0fc;
+      background: var(--paper);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      margin: 20px 0;
+    }
+
+    .boarding-pass.bp-tier-K50 { --bp-accent: #C98C18; --bp-tint: #FBF0DC; }
+    .boarding-pass.bp-tier-K80 { --bp-accent: var(--orange); --bp-tint: #FCE7DC; }
+    .boarding-pass.bp-tier-K150 { --bp-accent: #4B806B; --bp-tint: #E3EEE8; }
+
+    .bp-topbar {
+      background: linear-gradient(135deg, var(--bp-brand) 0%, var(--bp-brand-deep) 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bp-topbar .bp-back {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85em;
+      flex-shrink: 0;
+      cursor: pointer;
+      border: none;
+      color: white;
+    }
+
+    .bp-topbar h3 {
+      font-family: 'Fraunces', serif;
+      margin: 0;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .bp-event {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 20px 0;
+      margin-bottom: 16px;
+    }
+
+    .bp-event .bp-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bp-tint);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      flex-shrink: 0;
+    }
+
+    .bp-event h4 {
+      margin: 0 0 3px;
+      font-size: 0.95em;
+    }
+
+    .bp-event .bp-tag {
+      display: inline-block;
+      font-size: 0.68em;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: var(--bp-accent);
+      background: var(--bp-tint);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .bp-body {
+      padding: 0 20px 20px;
+    }
+
+    .bp-route {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .bp-route .bp-side { flex: 1; }
+    .bp-route .bp-side.right { text-align: right; }
+
+    .bp-route .bp-time {
+      font-size: 0.7em;
+      color: #999;
+      margin: 0 0 3px;
+    }
+
+    .bp-route .bp-code {
+      font-size: 1.3em;
+      font-weight: 800;
+      color: #222;
+      margin: 0 0 3px;
+    }
+
+    .bp-route .bp-place {
+      font-size: 0.72em;
+      color: #999;
+      margin: 0;
+    }
+
+    .bp-route .bp-mid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 0 10px;
+      flex-shrink: 0;
+    }
+
+    .bp-route .bp-mid .bp-dotline {
+      display: flex;
+      gap: 3px;
+    }
+
+    .bp-route .bp-mid .bp-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #dcdcf2;
+    }
+
+    .bp-route .bp-mid .bp-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bp-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9em;
+    }
+
+    .bp-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 14px;
+      padding: 16px 0;
+      border-top: 1px dashed #eee;
+      border-bottom: 1px dashed #eee;
+      margin-bottom: 18px;
+    }
+
+    .bp-details .bp-d-label {
+      font-size: 0.68em;
+      color: #999;
+      margin: 0 0 3px;
+    }
+
+    .bp-details .bp-d-value {
+      font-size: 0.85em;
+      font-weight: 700;
+      color: #222;
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .bp-qr {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .bp-qr img {
+      width: 170px;
+      max-width: 65%;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .bp-qr .bp-qr-id {
+      display: block;
+      font-size: 0.72em;
+      color: #999;
+      letter-spacing: 0.06em;
+    }
+
+    .bp-download-wrap {
+      padding: 0 20px 20px;
+    }
+
+    .bp-download {
+      width: 100%;
+      background: linear-gradient(135deg, var(--bp-brand) 0%, var(--bp-brand-deep) 100%);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.92em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <!-- SELLER APP -->
+  <div id="sellerApp" class="app">
+    <div class="header">
+      <div class="header-top">
+        <div class="avatar-row">
+          <div class="avatar">🎫</div>
+          <div>
+            <p class="greeting" id="sellerGreeting">Hello, Seller 👋</p>
+            <p class="title">Sell Tickets</p>
+          </div>
+        </div>
+        <div class="bell">🔔</div>
+      </div>
+      <div id="sellerStatsContainer" class="seller-stats hidden"></div>
+      <p id="sellerHeader" class="hidden"></p>
+    </div>
+
+    <div class="content">
+      <!-- Login Screen -->
+      <div id="sellerLoginScreen">
+        <div class="card">
+          <h2>👤 Seller Sign In</h2>
+          <div class="form-group">
+            <label>Your Name</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" id="sellerName" placeholder="e.g., John Banda" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Location/Booth</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">📍</span>
+              <input type="text" id="sellerLocation" placeholder="e.g., Main Gate, Booth 1" />
+            </div>
+          </div>
+          <button class="btn-primary" onclick="loginSeller()">Sign In</button>
+        </div>
+      </div>
+
+      <!-- Selling Screen -->
+      <div id="sellerSellScreen" class="hidden">
+        <div class="card">
+          <h2>🎟️ Sell Ticket</h2>
+          <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Customer pays → Enter details → Generate ticket</p>
+
+          <div class="form-group">
+            <label>Customer Name *</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" id="customerName" placeholder="Full name" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">📞</span>
+              <input type="tel" id="customerPhone" placeholder="+260977123456" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Ticket Type *</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🎟️</span>
+              <select id="ticketType">
+                <option value="K50">Early Bird - K50</option>
+                <option value="K80" selected>Regular - K80</option>
+                <option value="K150">VIP - K150</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>How Did They Pay? *</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">💳</span>
+              <select id="paymentMethod">
+                <option value="cash">Cash</option>
+                <option value="mobile_money">Mobile Money (MTN/Airtel)</option>
+                <option value="bank_transfer">Bank Transfer</option>
+                <option value="whatsapp_transfer">WhatsApp Transfer</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="generateTicket()">✨ Generate & Share Ticket</button>
+        </div>
+
+        <div id="ticketResultContainer" class="hidden">
+          <div id="ticketResult"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER TICKET PAGE -->
+  <div id="ticketApp" class="app">
+    <div class="header header--plain">
+      <h1>🎫 Your Ticket</h1>
+      <p>Sally Joy Camps • Oct 31st, 2026</p>
+    </div>
+
+    <div class="content ticket-page">
+      <div class="ticket-container" id="ticketContainer">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading ticket...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECK-IN APP -->
+  <div id="checkinApp" class="app">
+    <div class="header header--plain">
+      <h1>✅ Check-In</h1>
+      <p>Scan attendee tickets</p>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <h2>📱 Camera Scan</h2>
+        <div class="video-container">
+          <video id="scanVideo" autoplay playsinline></video>
+          <canvas id="scanCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⌨️ Manual Entry</h2>
+        <div class="form-group">
+          <label>Ticket ID</label>
+          <input type="text" id="manualTicketId" placeholder="Paste ticket ID" />
+          <button class="btn-success" onclick="manualCheckin()">Check In</button>
+        </div>
+      </div>
+
+      <div id="checkinResult"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div id="adminApp" class="app">
+    <div class="header header--plain">
+      <h1>📊 Dashboard</h1>
+      <p>Sales & Attendance Tracking</p>
+    </div>
+
+    <div class="content">
+      <div id="adminStatsContainer"></div>
+      <div id="adminTicketsContainer"></div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <div class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" onclick="switchApp('seller')">
+      <span class="nav-tab-icon">🎫</span>
+      <span>Sell</span>
+    </button>
+    <button class="nav-tab" onclick="switchApp('checkin')">
+      <span class="nav-tab-icon">✅</span>
+      <span>Check-In</span>
+    </button>
+    <button class="nav-tab" onclick="switchApp('admin')">
+      <span class="nav-tab-icon">📊</span>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-tab" onclick="switchApp('settings')">
+      <span class="nav-tab-icon">⚙️</span>
+      <span>Settings</span>
+    </button>
+  </div>
+
+  <script>
+    const API_URL = window.location.origin + '/api';
+    let currentSeller = null;
+
+    // ====== BOARDING PASS RENDERER ======
+    // Shared by the seller's post-sale screen and the customer ticket page,
+    // so both look and behave the same. `t` is normalized to:
+    // { qr, name, phone, type, price, ticketId, gate, doors }
+    const TIER_META = {
+      K50:  { label: 'Early Bird', icon: '⭐', gate: 'Main',        doors: '12:00 PM' },
+      K80:  { label: 'Regular',    icon: '🎟️', gate: 'Main',        doors: '12:00 PM' },
+      K150: { label: 'VIP',        icon: '👑', gate: 'VIP Entrance', doors: '11:30 AM' }
+    };
+
+    function renderBoardingPass(t) {
+      const meta = TIER_META[t.type] || { label: t.type, icon: '🎫', gate: 'Main', doors: '12:00 PM' };
+      return `
+        <div class="boarding-pass bp-tier-${t.type}">
+          <div class="bp-topbar">
+            <button class="bp-back" onclick="history.back()" aria-label="Back">←</button>
+            <h3>Boarding Pass</h3>
+          </div>
+          <div class="bp-event">
+            <div class="bp-icon">${meta.icon}</div>
+            <div>
+              <h4>Sally Joy Camps</h4>
+              <span class="bp-tag">${meta.label.toUpperCase()} · ${t.type}</span>
+            </div>
+          </div>
+          <div class="bp-body">
+            <div class="bp-route">
+              <div class="bp-side">
+                <p class="bp-time">Sat, Oct 31</p>
+                <p class="bp-code">GEN</p>
+                <p class="bp-place">General Admission</p>
+              </div>
+              <div class="bp-mid">
+                <div class="bp-dotline"><span class="bp-dot"></span><span class="bp-dot"></span><span class="bp-dot"></span></div>
+                <div class="bp-badge">🎟️</div>
+                <div class="bp-dotline"><span class="bp-dot"></span><span class="bp-dot"></span><span class="bp-dot"></span></div>
+              </div>
+              <div class="bp-side right">
+                <p class="bp-time">Doors ${meta.doors}</p>
+                <p class="bp-code">${t.type}</p>
+                <p class="bp-place">${meta.label}</p>
+              </div>
+            </div>
+            <div class="bp-details">
+              <div>
+                <p class="bp-d-label">Attendee</p>
+                <p class="bp-d-value">${t.name}</p>
+              </div>
+              <div>
+                <p class="bp-d-label">Phone</p>
+                <p class="bp-d-value">${t.phone}</p>
+              </div>
+              <div>
+                <p class="bp-d-label">Price</p>
+                <p class="bp-d-value">K${t.price}</p>
+              </div>
+              <div>
+                <p class="bp-d-label">Gate</p>
+                <p class="bp-d-value">${meta.gate}</p>
+              </div>
+              <div>
+                <p class="bp-d-label">Event Date</p>
+                <p class="bp-d-value">Oct 31, 2026</p>
+              </div>
+              <div>
+                <p class="bp-d-label">Ticket No.</p>
+                <p class="bp-d-value">#${t.ticketId.slice(0, 8)}</p>
+              </div>
+            </div>
+            <div class="bp-qr">
+              <img src="${t.qr}" alt="Ticket QR code">
+              <span class="bp-qr-id">${t.ticketId}</span>
+            </div>
+          </div>
+          <div class="bp-download-wrap">
+            <button class="bp-download" onclick="window.print()">↓ Download Ticket</button>
+          </div>
+        </div>
+      `;
+    }
+    let scanningActive = false;
+
+    // ====== APP SWITCHING ======
+    function switchApp(app) {
+      document.querySelectorAll('.app').forEach(a => a.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+      if (app === 'seller') {
+        document.getElementById('sellerApp').classList.add('active');
+        document.querySelectorAll('.nav-tab')[0].classList.add('active');
+      } else if (app === 'checkin') {
+        document.getElementById('checkinApp').classList.add('active');
+        document.querySelectorAll('.nav-tab')[1].classList.add('active');
+        startScanning();
+      } else if (app === 'admin') {
+        document.getElementById('adminApp').classList.add('active');
+        document.querySelectorAll('.nav-tab')[2].classList.add('active');
+        loadDashboard();
+      } else if (app === 'settings') {
+        if (currentSeller) {
+          currentSeller = null;
+          switchApp('seller');
+        }
+      }
+    }
+
+    // ====== SELLER LOGIN ======
+    async function loginSeller() {
+      const name = document.getElementById('sellerName').value.trim();
+      const location = document.getElementById('sellerLocation').value.trim();
+
+      if (!name || !location) {
+        alert('Please enter name and location');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/sellers/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ seller_name: name, location })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          currentSeller = data;
+          localStorage.setItem('currentSeller', JSON.stringify(data));
+          document.getElementById('sellerLoginScreen').classList.add('hidden');
+          document.getElementById('sellerSellScreen').classList.remove('hidden');
+          document.getElementById('sellerGreeting').textContent = `Hello, ${name} 👋`;
+          document.getElementById('sellerHeader').textContent = `${name} • ${location}`;
+          loadSellerStats();
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ====== GENERATE TICKET ======
+    async function generateTicket() {
+      if (!currentSeller) {
+        alert('Please sign in first');
+        return;
+      }
+
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+      const type = document.getElementById('ticketType').value;
+      const method = document.getElementById('paymentMethod').value;
+
+      if (!name || !phone) {
+        alert('Please enter customer name and phone');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/tickets/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer_name: name,
+            customer_phone: phone,
+            ticket_type: type,
+            payment_method: method,
+            seller_id: currentSeller.sellerId,
+            location: currentSeller.location
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          const ticket = data.ticket;
+          const boardingPass = renderBoardingPass({
+            qr: ticket.qrCode,
+            name: ticket.customerName,
+            phone: ticket.customerPhone,
+            type: ticket.type,
+            price: ticket.amount,
+            ticketId: ticket.ticketId
+          });
+          const html = `
+            <div class="ticket-result">
+              <h3 style="margin-bottom: 12px;">✅ Ticket Generated!</h3>
+              ${boardingPass}
+              <div class="action-buttons">
+                <button class="btn-primary" onclick="shareWhatsApp('${ticket.customerPhone}', '${ticket.ticketUrl}')">
+                  📱 Send WhatsApp
+                </button>
+                <button class="btn-secondary" onclick="showPhoneQR('${ticket.qrCode}')">
+                  📲 Show Customer
+                </button>
+              </div>
+            </div>
+          `;
+          document.getElementById('ticketResult').innerHTML = html;
+          document.getElementById('ticketResultContainer').classList.remove('hidden');
+
+          // Clear form
+          document.getElementById('customerName').value = '';
+          document.getElementById('customerPhone').value = '';
+
+          loadSellerStats();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // ====== SHARING FUNCTIONS ======
+    function shareWhatsApp(phone, ticketUrl) {
+      const cleanPhone = phone.replace(/\D/g, '');
+      const message = encodeURIComponent(`Your Sally Joy Camps ticket 🎫\n\n${window.location.origin}${ticketUrl}`);
+      window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
+    }
+
+    function printTicket(qr, name, type) {
+      const win = window.open('', '', 'height=600,width=400');
+      win.document.write(`
+        <div style="text-align: center; padding: 20px;">
+          <h2>Sally Joy Camps</h2>
+          <p>Oct 31st, 2026</p>
+          <img src="${qr}" style="max-width: 300px; margin: 20px 0;" />
+          <h3>${name}</h3>
+          <p style="font-size: 1.2em;"><strong>${type}</strong></p>
+          <p style="margin-top: 20px; color: #666;">Show this at the gate for entry</p>
+        </div>
+      `);
+      win.print();
+    }
+
+    function showPhoneQR(qrCode) {
+      alert('Show this QR code to your customer to screenshot:\n\n' + qrCode);
+    }
+
+    // ====== CHECK-IN ======
+    async function startScanning() {
+      if (scanningActive) return;
+      scanningActive = true;
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const video = document.getElementById('scanVideo');
+        video.srcObject = stream;
+        scanQR();
+      } catch (err) {
+        alert('Camera access denied');
+        scanningActive = false;
+      }
+    }
+
+    function scanQR() {
+      const video = document.getElementById('scanVideo');
+      const canvas = document.getElementById('scanCanvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+      if (code) {
+        processCheckIn(code.data);
+      } else if (scanningActive) {
+        requestAnimationFrame(scanQR);
+      }
+    }
+
+    async function manualCheckin() {
+      const ticketId = document.getElementById('manualTicketId').value.trim();
+      if (!ticketId) {
+        alert('Enter ticket ID');
+        return;
+      }
+      processCheckIn(ticketId);
+    }
+
+    async function processCheckIn(qrData) {
+      scanningActive = false;
+      try {
+        const res = await fetch(`${API_URL}/checkin/scan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ qrData, staffName: 'Staff' })
+        });
+
+        const data = await res.json();
+        const resultDiv = document.getElementById('checkinResult');
+
+        if (data.success) {
+          resultDiv.innerHTML = `
+            <div class="alert alert-success">
+              ✅ <strong>${data.ticket.name}</strong> checked in!<br>
+              ${data.ticket.type}
+            </div>
+          `;
+          setTimeout(() => {
+            resultDiv.innerHTML = '';
+            startScanning();
+          }, 2000);
+        } else {
+          resultDiv.innerHTML = `<div class="alert alert-error">⚠️ ${data.error}</div>`;
+          setTimeout(() => {
+            resultDiv.innerHTML = '';
+            startScanning();
+          }, 2000);
+        }
+      } catch (err) {
+        document.getElementById('checkinResult').innerHTML = `<div class="alert alert-error">Error: ${err.message}</div>`;
+      }
+    }
+
+    // ====== DASHBOARD ======
+    async function loadDashboard() {
+      try {
+        const res = await fetch(`${API_URL}/admin/stats`);
+        const stats = await res.json();
+
+        const html = `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <div class="stat-mini stat-mini--solid">
+              <div class="stat-mini-icon">🎟️</div>
+              <div>
+                <div class="stat-mini-value">${stats.total_tickets || 0}</div>
+                <div class="stat-mini-label">Total Sold</div>
+              </div>
+            </div>
+            <div class="stat-mini stat-mini--solid">
+              <div class="stat-mini-icon">✅</div>
+              <div>
+                <div class="stat-mini-value">${stats.checked_in || 0}</div>
+                <div class="stat-mini-label">Checked In</div>
+              </div>
+            </div>
+            <div class="stat-mini stat-mini--solid">
+              <div class="stat-mini-icon">💰</div>
+              <div>
+                <div class="stat-mini-value">K${stats.total_revenue || 0}</div>
+                <div class="stat-mini-label">Revenue</div>
+              </div>
+            </div>
+            <div class="stat-mini stat-mini--solid">
+              <div class="stat-mini-icon">⏳</div>
+              <div>
+                <div class="stat-mini-value">${stats.not_checked_in || 0}</div>
+                <div class="stat-mini-label">Pending</div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById('adminStatsContainer').innerHTML = html;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ====== SELLER STATS ======
+    async function loadSellerStats() {
+      if (!currentSeller) return;
+      try {
+        const res = await fetch(`${API_URL}/sellers/${currentSeller.sellerId}/sales`);
+        const data = await res.json();
+
+        if (data.error) {
+          console.error('Seller stats error:', data.error);
+        }
+
+        const totalSold = data.total_sold ?? 0;
+        const totalRevenue = data.total_revenue ?? 0;
+
+        const html = `
+          <div class="stat-mini">
+            <div class="stat-mini-icon">🎟️</div>
+            <div>
+              <div class="stat-mini-value">${totalSold}</div>
+              <div class="stat-mini-label">Sold Today</div>
+            </div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-icon">💰</div>
+            <div>
+              <div class="stat-mini-value">K${totalRevenue}</div>
+              <div class="stat-mini-label">Revenue</div>
+            </div>
+          </div>
+        `;
+        const container = document.getElementById('sellerStatsContainer');
+        container.innerHTML = html;
+        container.classList.remove('hidden');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ====== INITIALIZE ======
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('currentSeller');
+      if (saved) {
+        try {
+          currentSeller = JSON.parse(saved);
+          document.getElementById('sellerLoginScreen').classList.add('hidden');
+          document.getElementById('sellerSellScreen').classList.remove('hidden');
+          const data = currentSeller;
+          document.getElementById('sellerGreeting').textContent = `Hello, ${data.sellerName} 👋`;
+          document.getElementById('sellerHeader').textContent = `${data.sellerName} • ${data.location}`;
+          loadSellerStats();
+        } catch (err) {
+          localStorage.removeItem('currentSeller');
+        }
+      } else {
+        // Show login screen if no saved seller
+        document.getElementById('sellerLoginScreen').classList.remove('hidden');
+        document.getElementById('sellerSellScreen').classList.add('hidden');
+      }
+      switchApp('seller');
+    });
+
+    // ====== CUSTOMER TICKET PAGE ======
+    if (window.location.pathname.includes('/ticket/')) {
+      const ticketId = window.location.pathname.split('/').pop();
+      window.addEventListener('load', async () => {
+        document.getElementById('sellerApp').classList.remove('active');
+        document.getElementById('ticketApp').classList.add('active');
+        document.getElementById('navTabs').classList.add('hidden');
+
+        try {
+          const res = await fetch(`${API_URL}/tickets/${ticketId}`);
+          const ticket = await res.json();
+
+          const boardingPass = renderBoardingPass({
+            qr: ticket.qr_code,
+            name: ticket.customer_name,
+            phone: ticket.customer_phone,
+            type: ticket.ticket_type,
+            price: ticket.price,
+            ticketId: ticket.id
+          });
+          const html = `
+            <div class="event-info">
+              <p>🎫 <strong>Sally Joy Camps</strong></p>
+              <p>George Lilanda Edition</p>
+              <p>📅 Saturday, Oct 31st, 2026 • 12:00-18:00</p>
+              <p>📍 Mount Zion Church, George Lilanda, Lusaka</p>
+            </div>
+
+            ${boardingPass}
+
+            <div class="alert alert-info" style="margin: 0 0 15px;">
+              <strong>✅ Ticket Valid</strong><br>
+              Show this QR code at the gate for entry. Keep this page open or take a screenshot.
+            </div>
+
+            <button class="btn-secondary" onclick="shareTicket('${ticket.customer_name}')">
+              📱 Share This Page
+            </button>
+          `;
+          document.getElementById('ticketContainer').innerHTML = html;
+        } catch (err) {
+          document.getElementById('ticketContainer').innerHTML = `<div class="alert alert-error">Ticket not found</div>`;
+        }
+      });
+
+      function shareTicket(name) {
+        if (navigator.share) {
+          navigator.share({
+            title: 'Sally Joy Camps Ticket',
+            text: `${name}'s ticket for Sally Joy Camps on Oct 31st`,
+            url: window.location.href
+          });
+        } else {
+          alert('Copy this link to share:\n\n' + window.location.href);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

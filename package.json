@@ -1,10 +1,23 @@
 {
-  "type": "module",
+  "name": "sally-joy-camps-ticketing",
+  "version": "1.0.0",
+  "description": "Electronic Ticketing System for Sally Joy Camps - George Lilanda Edition",
+  "main": "server.js",
+  "type": "commonjs",
   "scripts": {
-    "test": "npx ava tests/*.test.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["ticketing", "qr-code", "event", "management"],
+  "author": "Saio Development Enterprise",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "qrcode": "^1.5.3"
   },
   "devDependencies": {
-    "ava": "^8.0.1",
-    "fs-extra": "^11.4.0"
+    "nodemon": "^3.0.1"
   }
 }
